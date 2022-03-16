@@ -1,19 +1,19 @@
 # FaaSnap
 
-This repo includes the artifact of paper: Lixiang Ao, George Porter, and Geoffrey M. Voelker. 2022. [FaaSnap: FaaS Made Fast Using Snapshot-based VMs. In Seventeenth European Conference on Computer Systems (EuroSys ’22), April 5–8, 2022, RENNES, France. ACM, New York, NY, USA, 17 pages.](https://doi.org/10.1145/3492321.3524270)
+This repo includes the artifact of paper: [Lixiang Ao, George Porter, and Geoffrey M. Voelker. 2022. FaaSnap: FaaS Made Fast Using Snapshot-based VMs. In Seventeenth European Conference on Computer Systems (EuroSys ’22), April 5–8, 2022, RENNES, France. ACM, New York, NY, USA, 17 pages.](https://doi.org/10.1145/3492321.3524270)
 
-The modified Firecracker VMM is in [https://github.com/ucsdsysnet/faasnap-firecracker].
+The modified Firecracker VMM is in https://github.com/ucsdsysnet/faasnap-firecracker.
 
-The guest kernels are in [https://github.com/ucsdsysnet/faasnap-kernel].
+The guest kernels are in https://github.com/ucsdsysnet/faasnap-kernel.
 
 # Setup
 ## Build
 1. Build Firecracker:
-    - Clone [https://github.com/ucsdsysnet/faasnap-firecracker]
+    - Clone https://github.com/ucsdsysnet/faasnap-firecracker
     - `tools/devtool build`
     - The built executable will be in `build/cargo_target/x86_64-unknown-linux-musl/debug/firecracker`
 1. Build guest kernels:
-    - Clone [https://github.com/ucsdsysnet/faasnap-kernel]
+    - Clone https://github.com/ucsdsysnet/faasnap-kernel
     - See faasnap-kernel/README.md
 1. Build function rootfs.
     - Build rootfs image. `pushd rootfs && make debian-rootfs.ext4 && popd`
@@ -46,7 +46,7 @@ The guest kernels are in [https://github.com/ucsdsysnet/faasnap-kernel].
 
 1. Run tests:
     - `sudo ./test.py test-2inputs.json`
-    - After the tests finish, go to http://<ip>:9411, and use traceIDs to find trace results.
+    - After the tests finish, go to `http://<ip>:9411`, and use traceIDs to find trace results.
 
 ## Experiment E2
 1. Configure `test-6inputs.json`.
@@ -54,7 +54,7 @@ The guest kernels are in [https://github.com/ucsdsysnet/faasnap-kernel].
 
 1. Run tests:
     - `sudo ./test.py test-6inputs.json`
-    - After the tests finish, go to http://<ip>:9411, and use traceIDs to find trace results.
+    - After the tests finish, go to `http://<ip>:9411`, and use traceIDs to find trace results.
 
 ## Experiment E3
 1. Configure `test-2inputs.json`.
@@ -64,7 +64,7 @@ The guest kernels are in [https://github.com/ucsdsysnet/faasnap-kernel].
 
 1. Run tests:
     `sudo ./test.py test-2inputs.json`
-    - After the tests finish, go to http://<ip>:9411, and use traceIDs to find trace results.
+    - After the tests finish, go to `http://<ip>:9411`, and use traceIDs to find trace results.
 
 ## Experiment E4
 1. Configure `test-2inputs.json`.
@@ -73,4 +73,4 @@ The guest kernels are in [https://github.com/ucsdsysnet/faasnap-kernel].
 
 1. Run tests:
     `sudo ./test.py test-2inputs.json`
-    - After the tests finish, go to http://<ip>:9411, and use traceIDs to find trace results.
+    - After the tests finish, go to `http://<ip>:9411`, and use traceIDs to find trace results.
