@@ -4,7 +4,7 @@ This repo includes the artifact of paper: Lixiang Ao, George Porter, and Geoffre
 
 The modified Firecracker VMM is in [https://github.com/ucsdsysnet/faasnap-firecracker].
 
-The guest kernels are in `https://github.com/ucsdsysnet/faasnap-kernel`.
+The guest kernels are in [https://github.com/ucsdsysnet/faasnap-kernel].
 
 # Setup
 ## Build
