@@ -1,0 +1,495 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: faasnap
+  description: FaaSnap API
+schemes:
+  - http
+host: 'localhost:8080'
+basePath: /
+responses:
+  400Error:
+    description: Invalid request
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+definitions:
+  Function:
+    type: object
+    required:
+      - func_name
+    properties:
+      func_name:
+        type: string
+      image:
+        type: string
+      kernel:
+        type: string
+      vcpu:
+        type: integer
+      mem_size:
+        type: integer
+  VM:
+    type: object
+    required:
+      - vmId
+    properties:
+      vmId:
+        type: string
+      state:
+        type: string
+      vmConf:
+        type: object
+      vmPath:
+        type: string
+  Snapshot:
+    type: object
+    required:
+      - vmId
+    properties:
+      vmId:
+        type: string
+      ssId:
+        type: string
+      snapshot_type:
+        type: string
+      snapshot_path:
+        type: string
+      mem_file_path:
+        type: string
+      version:
+        type: string
+      record_regions:
+        type: boolean
+      size_threshold:
+        type: integer
+      interval_threshold:
+        type: integer      
+  Invocation:
+    type: object
+    required:
+      - func_name
+    properties:
+      func_name:
+        type: string
+      vmId:
+        type: string
+      ssId:
+        type: string
+      params:
+        type: string
+      mincore:
+        type: integer
+        default: -1
+      mincore_size:
+        type: integer
+      loadMincore:
+        type: array
+        items: 
+          type: integer
+      use_mem_file:
+        type: boolean
+      overlay_regions:
+        type: boolean
+      use_ws_file:
+        type: boolean
+      vmm_load_ws:
+        type: boolean
+      enableReap:
+        type: boolean
+      wsFileDirectIo:
+        type: boolean
+      wsSingleRead:
+        type: boolean
+      namespace:
+        type: string
+
+paths:
+  /ui:
+    get:
+      description: UI
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: ok
+
+  /ui/data:
+    get:
+      description: UI
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: ok
+
+  /metrics:
+    get:
+      description: Metrics
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: ok
+
+  /functions:
+    get:
+      description: Return a list of functions
+      responses:
+        '200':
+          description: List of functions
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Function'
+    post:
+      description: Create a new function
+      parameters:
+        - name: function
+          in: body
+          schema:
+            $ref: '#/definitions/Function'
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/responses/400Error'
+  /vms:
+    get:
+      description: Returns a list of active VMs
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/VM'
+    post:
+      description: Create a new VM
+      parameters:
+        - name: VM
+          in: body
+          schema:
+            type: object
+            properties:
+              func_name:
+                type: string
+              ssId:
+                type: string
+              namespace:
+                type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/VM'
+        '400':
+          $ref: '#/responses/400Error'
+  '/vms/{vmId}':
+    get:
+      parameters:
+        - name: vmId
+          in: path
+          type: string
+          required: true
+      description: Describe a VM
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/VM'
+        '400':
+          $ref: '#/responses/400Error'
+    delete:
+      parameters:
+        - name: vmId
+          in: path
+          type: string
+          required: true
+      description: Stop a VM
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/responses/400Error'
+
+  /vmms:
+    post:
+      description: Create a VMM in the pool
+      parameters:
+        - name: VMM
+          in: body
+          schema:
+            type: object
+            properties:
+              namespace:
+                type: string
+              enableReap:
+                type: boolean
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/VM'
+        '400':
+          $ref: '#/responses/400Error'
+
+  /snapshots:
+    post:
+      description: Take a snapshot
+      parameters:
+        - name: snapshot
+          in: body
+          schema:
+            $ref: '#/definitions/Snapshot'
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/Snapshot'
+        '400':
+          $ref: '#/responses/400Error'
+    put:
+      description: Put snapshot (copy)
+      parameters:
+        - name: from_snapshot
+          in: query
+          type: string
+          required: true
+        - name: mem_file_path
+          in: query
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Snapshot'
+        '400':
+          $ref: '#/responses/400Error'
+  '/snapshots/{ssId}':
+    patch:
+      description: Change snapshot state
+      parameters:
+        - name: ssId
+          in: path
+          type: string
+          required: true
+        - name: state
+          in: body
+          required: false
+          schema:
+            type: object
+            properties:
+              dig_hole:
+                type: boolean
+              load_cache:
+                type: boolean
+              drop_cache:
+                type: boolean
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/responses/400Error'
+
+  '/snapshots/{ssId}/mincore':
+    get:
+      description: Get mincore state
+      parameters:
+        - name: ssId
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Mincore state
+          schema:
+            type: object
+            properties:
+              nlayers:
+                type: integer
+              n_nz_regions:
+                type: integer
+              nz_region_size:
+                type: integer
+              n_ws_regions:
+                type: integer
+              ws_region_size:
+                type: integer
+        '400':
+          $ref: '#/responses/400Error'
+    put:
+      description: Put mincore state
+      parameters:
+        - name: ssId
+          in: path
+          type: string
+          required: true
+        - name: source
+          in: query
+          type: string
+          required: false
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/responses/400Error'
+    post:
+      description: Add mincore layer
+      parameters:
+        - name: ssId
+          in: path
+          type: string
+          required: true
+        - name: layer
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              position:
+                type: integer
+              fromDiff:
+                type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/responses/400Error'
+    patch:
+      description: Change mincore state
+      parameters:
+        - name: ssId
+          in: path
+          type: string
+          required: true
+        - name: state
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              from_records_size:
+                type: integer
+              trim_regions:
+                type: boolean
+              to_ws_file:
+                type: string
+              inactive_ws:
+                type: boolean
+              zero_ws:
+                type: boolean
+              size_threshold:
+                type: integer
+              interval_threshold: 
+                type: integer
+              mincore_cache:
+                type: array
+                items:
+                  type: integer
+              drop_ws_cache:
+                type: boolean
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/responses/400Error'
+
+  '/snapshots/{ssId}/reap':
+    get:
+      description: get reap state
+      parameters:
+        - name: ssId
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/responses/400Error'
+    delete:
+      description: delete reap state
+      parameters:
+        - name: ssId
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/responses/400Error'
+    patch:
+      description: Change reap state
+      parameters:
+        - name: ssId
+          in: path
+          type: string
+          required: true
+        - name: cache
+          in: body
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/responses/400Error'
+
+  '/net-ifaces/{namespace}':
+    put:
+      description: Put a vm network
+      parameters:
+        - name: namespace
+          in: path
+          required: true
+          type: string
+        - name: interface
+          in: body
+          schema:
+            type: object
+            properties:
+              host_dev_name:
+                type: string
+              iface_id:
+                type: string
+              guest_mac:
+                type: string
+              guest_addr:
+                type: string
+              unique_addr:
+                type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: '#/responses/400Error'
+
+  /invocations:
+    post:
+      description: Post an invocation
+      parameters:
+        - name: invocation
+          in: body
+          schema:
+            $ref: '#/definitions/Invocation'
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: object
+            properties:
+              duration:
+                type: number
+              result:
+                type: string
+              vmId:
+                type: string
+              traceId:
+                type: string
+        '400':
+          $ref: '#/responses/400Error'
