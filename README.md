@@ -1,6 +1,8 @@
 # FaaSnap
 
-This repo includes the artifact of paper: [Lixiang Ao, George Porter, and Geoffrey M. Voelker. 2022. FaaSnap: FaaS Made Fast Using Snapshot-based VMs. In Seventeenth European Conference on Computer Systems (EuroSys ’22), April 5–8, 2022, RENNES, France. ACM, New York, NY, USA, 17 pages.](https://doi.org/10.1145/3492321.3524270)
+This repo includes the artifact of paper: 
+
+Lixiang Ao, George Porter, and Geoffrey M. Voelker. 2022. [FaaSnap: FaaS Made Fast Using Snapshot-based VMs.](https://doi.org/10.1145/3492321.3524270) In Seventeenth European Conference on Computer Systems (EuroSys ’22), April 5–8, 2022, RENNES, France. ACM, New York, NY, USA, 17 pages. 
 
 The modified Firecracker VMM is in https://github.com/ucsdsysnet/faasnap-firecracker.
 
